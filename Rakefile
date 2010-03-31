@@ -1,11 +1,3 @@
-# 
-# rspec
-require 'spec'
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new do |task|
-  task.libs << 'lib'
-end
- 
 #
 # Gem Packaging
 require 'rake/gempackagetask'
@@ -44,3 +36,7 @@ desc "Delete generated files"
 task :clean => :clobber_package do
     # all handled by dependencies for now. 
 end
+
+
+require 'newgem/tasks'
+Dir['tasks/**/*.rake'].each { |t| load t }

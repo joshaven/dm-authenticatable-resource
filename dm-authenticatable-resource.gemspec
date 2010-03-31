@@ -14,13 +14,14 @@ Gem::Specification.new do |s|
     "Passwords can be encrypted with any of these types: MD5, SHA1, SHA2, AES-128, AES-192, AES-256"
   #s.rubyforge_project = "dm-authenticatable-resource"
  
-  s.files = Dir['CHANGELOG', 'MIT-LICENSE', 'README', 'lib/**/*', 'spec/**/*']
+  s.files = Dir['CHANGELOG.md', 'MIT-LICENSE.md', 'README.md', 'lib/**/*', 'spec/**/*']
   s.has_rdoc = true
   s.require_path = 'lib'
   s.requirements << 'none'
  
   # note: I have not tried with older versions of any of the dependencies below
-  s.add_dependency('dm-core', ['~> 0.10.2']) 
-  s.add_dependency('rspec', ['~> 1.3.0'])           # only needed for testing
-  s.add_dependency('do_sqlite3', ['~> 0.10.1.1'])   # only needed for testing
+  s.add_dependency 'dm-core',     '~> 0.10.2' 
+  s.add_dependency 'rspec',       '~> 1.3.0'    # only needed for testing
+  s.add_dependency 'do_sqlite3',  '~> 0.10.1.1' # only needed for testing
+  s.add_dependency 'yard',        '~> 0.5.4'    # only for rdoc generation
 end

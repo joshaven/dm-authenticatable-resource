@@ -1,3 +1,5 @@
+# MIT License
+
 Copyright (c) 2010 Joshaven Potter
  
 Permission is hereby granted, free of charge, to any person obtaining a copy
