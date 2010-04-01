@@ -1,9 +1,9 @@
-desc "Generate RDoc"
-task :rdoc => ['rdoc:generate']
+desc "Generate RDocs"
+task :doc => ['doc:generate']
 
-namespace :rdoc do
+namespace :doc do
   project_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-  doc_destination = File.join(project_root, 'rdoc')
+  doc_destination = File.join(project_root, 'doc')
 
   begin
     require 'yard'
