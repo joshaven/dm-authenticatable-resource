@@ -1,9 +1,14 @@
 # DataMapper::AuthenticatableResource
+## Description
 A DataMapper::Resource with authentication baked in.
 
 * Documentation:   http://dm-authenticatable-resource.rubyforge.org/rdoc
 * Code Repository: http://github.com/joshaven/dm-authenticatable-resource
 * Joshaven Potter: yourtech@gmail.com
+
+## Purpose
+DataMapper::AuthenticatableResource assists in drying up a DataMapper user models.  It handles encryption, password 
+requirements, and authentication.  Simplicity and security is sanity.
 
 ## Installation
     gem install dm-authenticatable-resource  # or you may want to install with superuser:  sudo gem install dm-authenticatable-resource
