@@ -2,25 +2,60 @@ desc 'Generate and upload website files'
 task :website => [:website_generate, :website_upload, :publish_docs]
 
 namespace :website do
-  website = File.expand_path File.join(File.dirname(__FILE__), '..', 'website')
+  web_dir = File.expand_path File.join(File.dirname(__FILE__), '..', 'website')
+  web_src = File.expand_path File.join(File.dirname(__FILE__), '..', 'web_src')
   
   desc 'Generate website files'
   task :generate do
     require 'markdown'
-    sh "mkdir -p #{website}"
-    Dir['web_src/**/*.md'].each do |file| 
-      File.open(file.gsub(/md$/,'html'), 'w') do |f|
-        f.write [
-          '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"',
-          '  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
-          '',
-          '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">',
-          '  <head>',
-          '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />',
-          "    <title>#{File.basename(file).split('.md').join.capitalize}</title>".
-          '  </head>',
-          '  <body>',
-          ''].join("\n")
+    sh "mkdir -p #{web_dir}"
+    Dir[File.join(web_src,'**','*.md')].each do |file|
+      # file name without extention... /path/my.file.ext => my.file
+      file_name = File.basename(file).split(Regexp.new("(#{File.extname(file)})"))[0..-2].join 
+      File.open(File.join(web_dir, file_name + '.html'), 'w') do |f|
+        f.write [ '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"',
+                  '  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+                  '',
+                  '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">',
+                  '  <head>',
+                  '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />',
+                  "    <title>#{File.basename(file).split('.md').join.capitalize}</title>",
+                  '<style type="text/css">',
+                  '  body {',
+                  '    background: white;',
+                  '    color: black;',
+                  '    margin-left: 25px;',
+                  '  }',
+                  '  h1 {',
+                  '    color: rgb(51,51,51);',
+                  '    text-shadow: rgb(221, 221, 221) 3px 3px 5px;',
+                  '    font-size: 2em;',
+                  '  }',
+                  '  h2 {',
+                  '    color: rgb(34, 34, 34);',
+                  '    text-shadow: rgb(221, 221, 221) 3px 3px 5px;',
+                  '    font-size: 1.5em;',
+                  '  }',
+                  '  h3 {',
+                  '    color: rgb(34, 34, 34);',
+                  '    text-shadow: rgb(221, 221, 221) 3px 3px 5px;',
+                  '    font-size: 1.17em;',
+                  '  }',
+                  '  pre {',
+                  '  background-color: rgb(240, 240, 240);',
+                  '  border: 1px solid rgb(204, 203, 186);',
+                  '  padding: 10px 10px 10px 20px;',
+                  '}',
+                  '  code {',
+                  '    color: rgb(28,54,12);',
+                  '    white-space pre-wrap;',
+                  '    word-wrap: break-word;',
+                  '    font-size: 95%;',
+                  '  }',
+                  '</style>',
+                  '  </head>',
+                  '  <body>',
+                  ''].join("\n")
         f.write Markdown.new(File.read(file)).to_html
         f.write "  </body>\n</html>"
       end
