@@ -1,5 +1,5 @@
-$:.unshift('lib')
-require 'dm-authenticatable-resource'
+# $:.unshift('lib')
+require File.join File.dirname(__FILE__), 'lib', 'dm-authenticatable-resource'
  
 Gem::Specification.new do |s|
   s.author = "Joshaven Potter"
