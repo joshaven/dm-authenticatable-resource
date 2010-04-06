@@ -1,5 +1,5 @@
 desc 'Generate and upload website files'
-task :website => [:website_generate, :website_upload, :publish_docs]
+task :website => [:website_generate, :website_upload]
 
 namespace :website do
   web_dir = File.expand_path File.join(File.dirname(__FILE__), '..', 'website')
