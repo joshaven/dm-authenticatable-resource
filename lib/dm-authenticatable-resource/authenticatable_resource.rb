@@ -50,6 +50,11 @@ module DataMapper::AuthenticatableResource
       @aes_key=key
     end
     
+    def authenticate(user, pass)
+      self.first(authentication_properties[:login] => user).authenticates_with?(user, pass)
+    end
+    
+    
   end
   
   module InstanceMethods

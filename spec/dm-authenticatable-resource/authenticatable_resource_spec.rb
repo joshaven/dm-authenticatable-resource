@@ -152,6 +152,9 @@ describe 'Password' do
   end
   
   describe 'Authentication' do
+    before :each do
+      TestUser.auto_migrate!
+    end
     it 'should authenticate when given the proper login & password' do
       create_user.save
       u = TestUser.first 
@@ -159,6 +162,11 @@ describe 'Password' do
       u.authenticates_with?('user@example.com', 'Pa55word').should be_true
       u.authenticates_with?('user@example.com', 'wrong').should be_false
       u.authenticates_with?('wrong@example.com', 'Pa55word').should be_false
+    end
+    
+    it 'should authenticate on the class' do
+      create_user.save 
+      TestUser.authenticate('user@example.com', 'Pa55word').should be_true
     end
   end
   
