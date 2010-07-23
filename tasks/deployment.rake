@@ -9,8 +9,8 @@ task :deploy => [:check_version, :website, :release] do
   puts "Tagging release #{CHANGES}"
 end
 
-desc 'Runs tasks website_generate and install_gem as a local deployment of the gem'
-task :local_deploy => [:website_generate, :install_gem]
+desc 'Runs tasks website:generate and install_gem as a local deployment of the gem'
+task :local_deploy => [:'website:generate', :install]
 
 task :check_version do
   unless ENV['VERSION']
