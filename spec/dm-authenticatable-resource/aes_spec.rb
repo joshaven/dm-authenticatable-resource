@@ -44,6 +44,25 @@ describe 'Object extended with DataMapper::AuthenticatableResource::AES' do
     AES.decrypt(@AES_128, @key).should == @data
     lambda {AES.decrypt(@AES_128, 'WrongSecret KEY even if it is long enough').should == @data}.should raise_error
   end
+
+  it 'should run a full test' do
+    
+    class User
+      include DataMapper::AuthenticatableResource
+      property :id, Serial
+      property :login,            String,   :required => true, :length => 100
+      property :crypted_password, AES_256,  :required => true
+    
+      aes_key '7a5W8*jGb7^5hgsJ2a!@#Romans13:14'  # It is advisable to load this value from a 
+                                                  # file that is outside of all code repositories!
+    end
+    
+    u = User.new(:login => 'joe@example.com', :password=>'Pa55word', :password_confirmation=>'Pa55word')
+
+    u.decrypt_password.should == "Pa55word"
+    u.authenticates_with?('joe@example.com', 'Pa55word').should be_true
+
+  end
 end
 
 

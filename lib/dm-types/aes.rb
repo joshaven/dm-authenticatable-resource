@@ -35,10 +35,5 @@ module DataMapper
         value.is_binary_data? ? value : encrypt(value, property.model.aes_key, 'AES-256-ECB')
       end
     end
-
-    AES         = AES_128
-    AES_128_ECB = AES_128
-    AES_192_ECB = AES_192
-    AES_256_ECB = AES_256
   end
 end

@@ -37,9 +37,14 @@ private
     cipher = cipher + '-128' if /^AES$/ === cipher # default AES to AES-128
     cipher = cipher + '-ECB' if /^AES-\d+$/ === cipher # default AES-??? to AES-???-ECB (doesn't require an initialization vector)
     # Encrypted or Decript
-    aes = OpenSSL::Cipher::Cipher.new(cipher)
+    aes = OpenSSL::Cipher::Cipher.new(sanitized(cipher))
     aes.__send__(direction)
     aes.key = key
     aes.update(data) + aes.final
+  end
+
+  def sanitized(string)
+    retrun false unless string.is_a? String
+    string.split('::').last
   end
 end
