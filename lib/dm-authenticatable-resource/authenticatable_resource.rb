@@ -42,19 +42,17 @@ module DataMapper::AuthenticatableResource
     end
     
     # AES encryption key getter and setter
-    # attr_accessor :aes_key
+    attr_writer :aes_key
     def aes_key(key=nil)
       key.nil? ? @aes_key : @aes_key = key
     end
-    def aes_key=(key)
-      @aes_key=key
-    end
+    # def aes_key=(key)
+    #   @aes_key=key
+    # end
     
     def authenticate(user, pass)
       self.first(authentication_properties[:login] => user).authenticates_with?(user, pass)
     end
-    
-    
   end
   
   module InstanceMethods
@@ -80,7 +78,7 @@ module DataMapper::AuthenticatableResource
       # Setup the password_requirements proc... the proc must receive a password string and return true/false
       password_requirements &attributes[:password_requirements] if attributes[:password_requirements].is_a?(Proc)
   
-      @auth_method = attributes[:auth_method] unless attributes[:auth_method].nil?
+      self.attribute_set :auth_method, attributes[:auth_method] unless attributes[:auth_method].nil?
   
       # run the DataMapper initialize method (minus the password initializer password data)
       super(attributes.reject {|k,v| k.to_s =~ /password(_confirmation)?/}, &block)
@@ -161,6 +159,8 @@ module DataMapper::AuthenticatableResource
     #   user.authenticates_with? 'user@example.com', 'MySecret'      #=> true
     #   user.authenticates_with? 'wrong@example.com', 'MySecret'     #=> false
     #   user.authenticates_with? 'user@example.com', 'WrongSecret'   #=> false
+# FIXME: this should be:
+    # def authenticates_with?(login, pass, encryption_type=self.auth_method)
     def authenticates_with?(login, pass, encryption_type=nil)
       return false unless self.send(props[:login]) == login
       encrypted(pass, encryption_type) == self.send(props[:crypted_password])
@@ -178,9 +178,10 @@ module DataMapper::AuthenticatableResource
     
   private
     def encryption_type_from_property
+      # This returns something like 'MD5', 'SHA2', etc.
       if self.class.properties[props[:crypted_password]]
-        if self.class.properties[props[:crypted_password]].type.public_methods.include? 'encryption_type'
-          self.class.properties[props[:crypted_password]].type.encryption_type
+        if self.class.properties[props[:crypted_password]].class.public_methods.include? 'encryption_type'
+          self.class.properties[props[:crypted_password]].class.encryption_type
         else
           nil
         end
@@ -191,18 +192,21 @@ module DataMapper::AuthenticatableResource
       self.class.aes_key
     end
 
-    def encrypted(string, encryption_method=nil)
-      case encryption_method = (encryption_method || self.auth_method).to_s.upcase
-      when 'SHA1'
-        Digest::SHA1.hexdigest string
-      when 'SHA2'
-        Digest::SHA2.hexdigest string
-      when 'MD5'
-        Digest::MD5.hexdigest string
-      when /^AES-?\d*(-ECB)?$/
-        self.class.encrypt(string, encryption_key, encryption_method)
-      else
-        warn "I don't know how to do '#{encryption_method}' encryption.  Please check your config/password_encryption.yml"
+    def encrypted(string, encryption_meth=nil)
+# TODO dry this up a bit... its kind of silly but working...
+# Reversable Encryption methods should be identified another way.  Probaby by including ReversableEncryptionType which could be 
+# the same as include EncryptionType except that it is reversable?.  Then the :digest method should work with 
+# the encryption_key & encryption_meth.  Maybe digest could always look for encryption_key, encryption_meth
+      encryption_meth ||= auth_method
+      if encryption_meth.is_a? String
+        encryption_meth = encryption_meth.split('::').last 
+        if /^AES-?\d*(-ECB)?$/ =~ encryption_meth # Case for reversable encryption 'AES-128', 'AES-256-ECB', etc
+          self.class.encrypt(string, encryption_key, encryption_meth)
+        else encryption_meth.is_a?(String)  # Case for one way encryption 'MD5', 'SHA1', etc
+          eval("DataMapper::Property::#{encryption_meth}").digest.call(string)
+        end
+      else  # case where an instance of an encryptable DataMapper::Properity::xxx is specified (MD5, AES, etc.)
+        typecast(string)
       end
     end
 

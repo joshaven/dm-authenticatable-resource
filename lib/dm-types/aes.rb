@@ -1,61 +1,44 @@
-module DataMapper::Types
-  class AES_128 < DataMapper::Type #:nodoc:
-    extend DataMapper::AuthenticatableResource::AES
-    primitive Text
+module DataMapper
+  class Property
+    class AES_128 < Text #:nodoc:
+      include DataMapper::Property::EncryptionType
+      extend DataMapper::AuthenticatableResource::AES
     
-    attr_accessor :encrypted
-  
-    def self.load(value, property)
-      typecast(value, property)
+      attr_accessor :encrypted
+
+      def typecast(value)
+        return nil if value.nil?
+        value.is_binary_data? ? value : encrypt(value, property.model.aes_key, 'AES-128-ECB')
+      end
+    end
+
+    class AES_192 < Text #:nodoc:
+      include DataMapper::Property::EncryptionType
+      extend DataMapper::AuthenticatableResource::AES
+      
+      attr_accessor :encrypted
+      
+      def typecast(value)
+        return nil if value.nil?
+        value.is_binary_data? ? value : encrypt(value, property.model.aes_key, 'AES-192-ECB')
+      end
     end
   
-    def self.dump(value, property)
-      typecast(value, property)
-    end
-  
-    def self.typecast(value, property)
-      return nil if value.nil?
-      value.is_binary_data? ? value : encrypt('Pa55word', property.model.aes_key, 'AES-128-ECB')
-    end
-  end
-  
-  class AES_192 < DataMapper::Type #:nodoc:
-    extend DataMapper::AuthenticatableResource::AES
-    primitive Text
+    class AES_256 < Text #:nodoc:
+      include DataMapper::Property::EncryptionType
+      extend DataMapper::AuthenticatableResource::AES
     
-    attr_accessor :encrypted
+      attr_accessor :encrypted
   
-    def self.load(value, property)
-      typecast(value, property)
+      def typecast(value)
+        return nil if value.nil?
+        value.is_binary_data? ? value : encrypt(value, property.model.aes_key, 'AES-256-ECB')
+      end
     end
-  
-    def self.dump(value, property)
-      typecast(value, property)
-    end
-  
-    def self.typecast(value, property)
-      return nil if value.nil?
-      value.is_binary_data? ? value : encrypt('Pa55word', property.model.aes_key, 'AES-192-ECB')
-    end
-  end
-  
-  class AES_256 < DataMapper::Type #:nodoc:
-    extend DataMapper::AuthenticatableResource::AES
-    primitive Text
-    
-    attr_accessor :encrypted
-  
-    def self.load(value, property)
-      typecast(value, property)
-    end
-  
-    def self.dump(value, property)
-      typecast(value, property)
-    end
-  
-    def self.typecast(value, property)
-      return nil if value.nil?
-      value.is_binary_data? ? value : encrypt('Pa55word', property.model.aes_key, 'AES-256-ECB')
-    end
+
+    AES         = AES_128
+    AES_128_ECB = AES_128
+    AES_192_ECB = AES_192
+    AES_256_ECB = AES_256
   end
 end

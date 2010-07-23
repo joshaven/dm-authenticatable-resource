@@ -74,7 +74,7 @@ namespace :website do
 
   desc 'Remove the website folder'
   task :clean do
-    puts "Attempting to remove: #{website}"
-    rm_r website if File.exists?(website)
+    puts "Attempting to remove: #{web_dir}"
+    rm_r web_dir if File.exists?(web_dir)
   end
 end

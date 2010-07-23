@@ -20,8 +20,10 @@ Gem::Specification.new do |s|
   s.requirements << 'none'
  
   # note: I have not tried with older versions of any of the dependencies below
-  s.add_dependency 'dm-core',     '~> 0.10.2' 
-  s.add_dependency 'rspec',       '~> 1.3.0'    # only needed for testing
-  s.add_dependency 'do_sqlite3',  '~> 0.10.1.1' # only needed for testing
-  s.add_dependency 'yard',        '~> 0.5.4'    # only for rdoc generation
+  s.add_dependency 'dm-core',     '>= 1.0.0'
+  s.add_dependency 'dm-migrations',  '>= 1.0.0' # only needed for testing
+  s.add_dependency 'dm-validations', '>= 1.0.0'
+  s.add_dependency 'dm-sqlite-adapter' '>= 1.0.0' # only needed for testing
+  s.add_dependency 'rspec',       '>= 1.3.0'    # only needed for testing
+  s.add_dependency 'yard',        '>= 0.5.4'    # only for rdoc generation
 end

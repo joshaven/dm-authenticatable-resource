@@ -58,6 +58,12 @@ describe 'Password' do
     #   TestUser.class_eval { undef :email= }
     #   TestUser.instance_methods.should_not include('email=')
     # end
+    it 'should save the auth_method if given as an attribute' do
+      t=create_user({:name => 'Job User', :login => 'user@example.com', :auth_method => 'SHA2'})
+      t.save.should be_true
+      t.auth_method.should == 'SHA2'
+      TestUser.first(:id=>t.id).auth_method.should == t.auth_method
+    end
 
     describe 'with custom login & crypted_password properties' do
       it 'should be valid on initialization, given a handeler' do
@@ -156,8 +162,9 @@ describe 'Password' do
       TestUser.auto_migrate!
     end
     it 'should authenticate when given the proper login & password' do
+      TestUser.auto_migrate!
       create_user.save
-      u = TestUser.first 
+      u = TestUser.first
 
       u.authenticates_with?('user@example.com', 'Pa55word').should be_true
       u.authenticates_with?('user@example.com', 'wrong').should be_false
@@ -174,6 +181,7 @@ describe 'Password' do
     describe 'set in class definition' do
       %w(MD5 SHA1 SHA2).each do |auth_method|
         it "should autoset the encryption type based upon the property type for #{auth_method}" do
+          Object.send(:remove_const, :TemporaryUser) if Object.const_defined?(:TemporaryUser)
           eval "class TemporaryUser
                   include DataMapper::AuthenticatableResource
                   property :id, Serial
@@ -181,7 +189,6 @@ describe 'Password' do
                   property :crypted_password, #{auth_method},   :lazy => false, :required => true
                   auto_migrate!
                 end"
-  
           TemporaryUser.new(:login => 'joe@example.com', :password=>'Pa55word', :password_confirmation=>'Pa55word').save.should be_true
           TemporaryUser.first.crypted_password.should == eval("Digest::#{auth_method}.hexdigest('Pa55word')")
         end
